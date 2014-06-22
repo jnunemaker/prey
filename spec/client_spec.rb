@@ -79,4 +79,22 @@ describe Prey::Client do
       received_items.map(&:data).sort.should eq(items[0, 2])
     end
   end
+
+  describe "#flush" do
+    it "flushes queue" do
+      items = ["1", "2", "3"]
+      subject.thrift.put(queue_name, items, expiration_msec)
+      subject.flush(queue_name)
+      received_items = subject.thrift.get(queue_name, items.size, timeout, abort_timeout)
+      received_items.should eq([])
+    end
+  end
+
+  describe "#size" do
+    it "returns size of queue" do
+      items = ["1", "2", "3"]
+      subject.thrift.put(queue_name, items, expiration_msec)
+      subject.size(queue_name).should be(3)
+    end
+  end
 end
