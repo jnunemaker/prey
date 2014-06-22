@@ -62,7 +62,7 @@ describe Prey::Client do
       subject.thrift.put(queue_name, items, expiration_msec)
       received_items = subject.thrift.get(queue_name, items.size, timeout, abort_timeout)
       subject.confirm(queue_name, received_items[0, 2])
-      sleep 0.1
+      sleep 0.5
       received_items = subject.thrift.get(queue_name, items.size, timeout, abort_timeout)
       received_items.map(&:data).sort.should eq(items[2, 3])
     end
@@ -70,7 +70,7 @@ describe Prey::Client do
 
   describe "#abort" do
     it "aborts items" do
-      abort_timeout = 200
+      abort_timeout = 10_000
       items = ["1", "2", "3"]
       subject.thrift.put(queue_name, items, expiration_msec)
       received_items = subject.thrift.get(queue_name, items.size, timeout, abort_timeout)
