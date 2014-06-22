@@ -1,6 +1,7 @@
 require_relative "2.4.1/kestrel"
 require "thrift_client"
 require "prey/server"
+require "prey/item"
 
 module Prey
   class Client
@@ -53,7 +54,9 @@ module Prey
       timeout       = options.fetch(:timeout, 0)
       abort_timeout = options.fetch(:abort_timeout, 0)
 
-      @thrift.get(queue_name, max_items, timeout, abort_timeout)
+      if thrift_items = @thrift.get(queue_name, max_items, timeout, abort_timeout)
+        thrift_items.map { |item| Item.new(item) }
+      end
     end
 
     def put(queue_name, items)
