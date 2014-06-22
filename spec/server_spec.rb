@@ -2,9 +2,10 @@ require "helper"
 require "prey/server"
 
 describe Prey::Server do
-  let(:client) { Prey::Client.new }
+  let(:thrift) { Prey::Cluster.new.thrift }
+  let(:queue_name) { "prey" }
 
-  before(:each) { client.flush('default') }
+  before(:each) { thrift.flush_queue(queue_name) }
 
   describe "#stats" do
     it "returns hash" do
@@ -20,14 +21,14 @@ describe Prey::Server do
 
   describe "#queue_size" do
     it "returns size" do
-      client.put("default", [""])
-      client.put("default", [""])
-      subject.queue_size("default").should be(2)
+      thrift.put(queue_name, [""], 0)
+      thrift.put(queue_name, [""], 0)
+      subject.queue_size(queue_name).should be(2)
     end
 
     it "returns 0 for down server" do
       server = described_class.new(memcache_port: 9999)
-      server.queue_size("default").should be(0)
+      server.queue_size(queue_name).should be(0)
     end
   end
 end

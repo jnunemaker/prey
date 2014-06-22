@@ -2,8 +2,9 @@ require "prey/item"
 
 module Prey
   class Queue
-    def initialize(thrift, name)
-      @thrift = thrift
+    def initialize(cluster, name)
+      @cluster = cluster
+      @thrift = @cluster.thrift
       @name = name
     end
 
@@ -51,6 +52,12 @@ module Prey
 
     def flush
       @thrift.flush_queue(@name)
+    end
+
+    def size
+      @cluster.servers.uniq.inject(0) do |sum, server|
+        sum += server.queue_size(@name)
+      end
     end
   end
 end
