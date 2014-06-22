@@ -69,7 +69,7 @@ module Prey
       @thrift.put(queue_name, items, expiration_msec)
     end
 
-    def confirm(items)
+    def confirm(queue_name, items)
       ids = items.map { |item| item.id }
       @thrift.confirm(queue_name, ids)
     end

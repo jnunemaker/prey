@@ -54,4 +54,29 @@ describe Prey::Client do
       end
     end
   end
+
+  describe "#confirm" do
+    it "confirms items" do
+      abort_timeout = 5
+      items = ["1", "2", "3"]
+      subject.thrift.put(queue_name, items, expiration_msec)
+      thrift_items = subject.thrift.get(queue_name, items.size, timeout, abort_timeout)
+      subject.confirm(queue_name, thrift_items[0, 2])
+      sleep 0.1
+      thrift_items = subject.thrift.get(queue_name, items.size, timeout, abort_timeout)
+      thrift_items.map(&:data).sort.should eq(items[2, 3])
+    end
+  end
+
+  describe "#abort" do
+    it "aborts items" do
+      abort_timeout = 200
+      items = ["1", "2", "3"]
+      subject.thrift.put(queue_name, items, expiration_msec)
+      thrift_items = subject.thrift.get(queue_name, items.size, timeout, abort_timeout)
+      subject.abort(queue_name, thrift_items[0, 2])
+      thrift_items = subject.thrift.get(queue_name, items.size, timeout, abort_timeout)
+      thrift_items.map(&:data).sort.should eq(items[0, 2])
+    end
+  end
 end
