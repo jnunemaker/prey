@@ -4,17 +4,7 @@ Kestrel client gem that uses the thrift interface.
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-    gem 'prey'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install prey
+Not released yet.
 
 ## Usage
 

@@ -4,60 +4,31 @@ module Prey
   class Queue
     def initialize(cluster, name)
       @cluster = cluster
-      @thrift = @cluster.thrift
       @name = name
     end
 
-    # Public: Gets items from a queue.
-    #
-    # options: Hash options:
-    #          max_items: the maximum number of items ot fetch
-    #          timeout: timeout to wait for items (0 for nonblocking)
-    #          abort_timeout: if zero, items are considered confirmed, if
-    #                         greater than zero, items must be confirmed
-    #                         before abort_timeout milliseconds have ellapsed
-    #                         or the items will be re-enqueued
-    #
-    # Returns zero items if no items could be fetched within the time.
-    # Otherwise returns up to `max_items` or 1 by default.
-    def get(options = {})
-      max_items     = options.fetch(:max_items, 1)
-      timeout       = options.fetch(:timeout, 0)
-      abort_timeout = options.fetch(:abort_timeout, 0)
-
-      if thrift_items = @thrift.get(@name, max_items, timeout, abort_timeout)
-        thrift_items.map { |item| Item.new(item) }
-      end
+    def get(*args)
+      @cluster.get(@name, *args)
     end
 
-    def put(items, expiration_msec = 0)
-      items = case items
-      when Array
-        items
-      else
-        [items]
-      end
-      @thrift.put(@name, items, expiration_msec)
+    def put(*args)
+      @cluster.put(@name, *args)
     end
 
-    def confirm(items)
-      ids = items.map { |item| item.id }
-      @thrift.confirm(@name, ids)
+    def confirm(*args)
+      @cluster.confirm(@name, *args)
     end
 
-    def abort(items)
-      ids = items.map { |item| item.id }
-      @thrift.abort(@name, ids)
+    def abort(*args)
+      @cluster.abort(@name, *args)
     end
 
-    def flush
-      @thrift.flush_queue(@name)
+    def flush(*args)
+      @cluster.flush(@name, *args)
     end
 
-    def size
-      @cluster.servers.uniq.inject(0) do |sum, server|
-        sum += server.queue_size(@name)
-      end
+    def size(*args)
+      @cluster.queue_size(@name, *args)
     end
   end
 end
