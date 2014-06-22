@@ -59,14 +59,13 @@ module Prey
       end
     end
 
-    def put(queue_name, items)
+    def put(queue_name, items, expiration_msec = 0)
       items = case items
       when Array
         items
       else
         [items]
       end
-      expiration_msec = 0
       @thrift.put(queue_name, items, expiration_msec)
     end
 

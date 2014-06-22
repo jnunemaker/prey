@@ -43,5 +43,15 @@ describe Prey::Client do
         thrift_items.map(&:data).sort.should eq(items.sort)
       end
     end
+
+    context "with expiration" do
+      it "works" do
+        item = "1"
+        subject.put(queue_name, item, 1)
+        sleep 0.001 # ensure item expires
+        thrift_item = subject.thrift.get(queue_name, max_items, timeout, abort_timeout).first
+        thrift_item.should be_nil
+      end
+    end
   end
 end
