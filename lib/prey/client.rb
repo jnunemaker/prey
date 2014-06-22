@@ -1,7 +1,7 @@
 require_relative "2.4.1/kestrel"
 require "thrift_client"
 require "prey/server"
-require "prey/item"
+require "prey/queue"
 
 module Prey
   class Client
@@ -34,6 +34,10 @@ module Prey
       @thrift = ThriftClient.new(Thrift::Client, thrift_servers, options)
     end
 
+    def [](queue_name)
+      Queue.new(@thrift, queue_name)
+    end
+
     # Public: Gets items from a queue.
     #
     # options: Hash options:
@@ -47,37 +51,23 @@ module Prey
     # Returns zero items if no items could be fetched within the time.
     # Otherwise returns up to `max_items` or 1 by default.
     def get(queue_name, options = {})
-      max_items     = options.fetch(:max_items, 1)
-      timeout       = options.fetch(:timeout, 0)
-      abort_timeout = options.fetch(:abort_timeout, 0)
-
-      if thrift_items = @thrift.get(queue_name, max_items, timeout, abort_timeout)
-        thrift_items.map { |item| Item.new(item) }
-      end
+      self[queue_name].get(options)
     end
 
     def put(queue_name, items, expiration_msec = 0)
-      items = case items
-      when Array
-        items
-      else
-        [items]
-      end
-      @thrift.put(queue_name, items, expiration_msec)
+      self[queue_name].put(items, expiration_msec)
     end
 
     def confirm(queue_name, items)
-      ids = items.map { |item| item.id }
-      @thrift.confirm(queue_name, ids)
+      self[queue_name].confirm(items)
     end
 
     def abort(queue_name, items)
-      ids = items.map { |item| item.id }
-      @thrift.abort(queue_name, ids)
+      self[queue_name].abort(items)
     end
 
     def flush(queue_name)
-      @thrift.flush_queue(queue_name)
+      self[queue_name].flush
     end
 
     def size(queue_name)
