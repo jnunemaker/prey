@@ -5,9 +5,6 @@ require "prey/item"
 
 module Prey
   class Client
-    # Private: The array of servers this client will talk to.
-    attr_reader :servers
-
     # Private: The underlying thrift client.
     attr_reader :thrift
 
