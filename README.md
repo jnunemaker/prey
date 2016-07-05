@@ -1,3 +1,5 @@
+**Note**: This is unfinished. I don't remember what is left and don't have a need for it anymore but I'm leaving it in case anyone stumbles across it and finds it useful.
+
 # Prey
 
 Kestrel client gem that uses the thrift interface.
